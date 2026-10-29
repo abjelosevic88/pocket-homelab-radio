@@ -1,0 +1,23 @@
+[Unit]
+Description=Pocket Radio — internet radio and stations of your own
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pocket-radio
+Group=pocket-radio
+ExecStart=/usr/local/bin/pocket-radio
+Environment=DATA_DIR=/var/lib/pocket-radio
+Environment=PORT=8080
+Environment=BASE_URL=https://radio.example.com
+Environment=SECURE_COOKIES=true
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/pocket-radio
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

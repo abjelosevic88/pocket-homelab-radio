@@ -1,0 +1,5 @@
+# Pocket Radio behind Caddy. Homepage widgets and linked apps send their own
+# bearer token to /api/*.
+radio.example.com {
+	reverse_proxy pocket-radio:8080
+}
