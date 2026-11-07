@@ -1,6 +1,6 @@
 // Listening history: how much, when and what — the last week, month,
 // quarter or year — and every stretch of listening, which you can remove.
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api, V1 } from '../lib/api'
 import { usePlayer } from '../lib/player'
 import { fmtDate, fmtDateTime, fmtDuration } from '../lib/format'
@@ -18,6 +18,22 @@ function hm(seconds: number) {
   return fmtDuration(min)
 }
 
+/** The element's real width, so a chart draws 1:1 and its text, dots and corners keep their shape. */
+function useWidth(fallback: number) {
+  const [w, setW] = useState(fallback)
+  const ro = useRef<ResizeObserver | null>(null)
+  const ref = useCallback((el: Element | null) => {
+    ro.current?.disconnect()
+    ro.current = null
+    if (!el) return
+    const measure = () => { const cw = Math.round(el.getBoundingClientRect().width); if (cw > 0) setW(cw) }
+    measure()
+    ro.current = new ResizeObserver(measure)
+    ro.current.observe(el)
+  }, [])
+  return [ref, w] as const
+}
+
 /** Minutes per day (or per week for a year) as plain bars. */
 function Bars({ days, weekly }: { days: History['days']; weekly: boolean }) {
   const buckets = useMemo(() => {
@@ -30,12 +46,13 @@ function Bars({ days, weekly }: { days: History['days']; weekly: boolean }) {
     return out
   }, [days, weekly])
   const max = Math.max(60, ...buckets.map(b => b.seconds))
-  const W = 700, H = 150
+  const [ref, W] = useWidth(700)
+  const H = 168
   const bw = (W - 8) / Math.max(1, buckets.length)
   const every = Math.ceil(buckets.length / (W > 500 ? 8 : 5))
   return (
-    <div className="hs-bars">
-      <svg viewBox={`0 0 ${W} ${H + 2}`} preserveAspectRatio="none" role="img" aria-label={weekly ? 'Minutes per week' : 'Minutes per day'}>
+    <div className="hs-bars" ref={ref}>
+      <svg viewBox={`0 0 ${W} ${H + 2}`} width={W} height={H + 2} role="img" aria-label={weekly ? 'Minutes per week' : 'Minutes per day'}>
         <line x1={0} x2={W} y1={H} y2={H} className="hs-axis" />
         {buckets.map((b, i) => {
           const h = b.seconds ? Math.max(2, (b.seconds / max) * (H - 6)) : 0
