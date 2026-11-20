@@ -239,6 +239,7 @@ func (s *Server) registerWithCore(ctx context.Context) error {
 		Publishes: eventTopics,
 		Offers:    linkOffers,
 		Uses:      append(linkUses(), core.InferenceUse()),
+		Portable:  portable,
 		Services:  []core.ServiceUse{{Type: "navidrome", Reason: "Play channels of your own from your music library"}},
 	}
 	if s.cfg.BaseURL != "" {

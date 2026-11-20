@@ -21,6 +21,20 @@ var linkOffers = []core.Offer{
 	{Scope: "radio:write", Name: "Add stations", Description: "Add an internet radio station to your favourites from another app (the local station of a trip, a station a friend shared). It changes nothing else."},
 }
 
+// portable is what Pocket Move may copy out and bring in for a person
+// (docs/move.md in pocket-homelab-core); Register adds move:export/import.
+var portable = &core.Portable{
+	Exports: []core.PortableExport{
+		{Path: "/api/v1/export.json", File: "radio.json", Kind: core.KindPocket, Title: "Your stations, channels, listening history and the songs you heard"},
+		{Path: "/api/v1/export.csv", File: "listening.csv", Kind: core.KindCSV, Title: "Your listening history as a table"},
+		{Path: "/api/v1/stations/export.m3u", File: "stations.m3u", Kind: "m3u", Title: "Your stations as an M3U playlist for any radio player"},
+	},
+	Imports: []core.PortableImport{
+		{Path: "/api/v1/import", Kind: core.KindPocket, ContentType: "application/json", Title: "Adds the stations, channels, listening history and songs heard from another box; what you already have is left alone"},
+		{Path: "/api/v1/stations/import", Kind: "m3u", ContentType: "audio/x-mpegurl", Title: "Adds the stations in an M3U or PLS playlist; stations you already have are skipped"},
+	},
+}
+
 type linkRoute struct {
 	methods string
 	path    *regexp.Regexp
@@ -39,6 +53,9 @@ var errLinkScope = errors.New("outside the link's scope")
 
 // linkAllows reports whether a link token with these scopes may make this request.
 func linkAllows(scopes []string, r *http.Request) bool {
+	if portable.LinkAllows(scopes, r) {
+		return true
+	}
 	for _, lr := range linkRoutes {
 		if !strings.Contains(" "+lr.methods+" ", " "+r.Method+" ") || !lr.path.MatchString(r.URL.Path) {
 			continue

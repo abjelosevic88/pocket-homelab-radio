@@ -80,4 +80,7 @@ While anyone listens, one broadcast plays for all of them; it goes off air 20 s 
 Offers `radio:read` (`/dashboard /now /history /stations /stations/{id} /channels /channels/{id} /heard /day/{date}`)
 and `radio:write` (`POST /stations` — adds a favourite, marked with the acting app). Publishes `radio.listened`
 (a listen of a minute or more ended), `radio.song_saved`, `radio.station_added`.
+Pocket Move can copy your stations, channels and listening out and bring them in: `GET /pocket/portable` describes the
+exports (`move:export`: `/export.json`, `/export.csv`, `/stations/export.m3u`) and imports (`move:import`: `POST /import`,
+`POST /stations/import`). Imports only add; a second run of the same file adds nothing.
 Uses Pocket Music (`playlists:write`), the person's Navidrome login (service `navidrome`) and Pocket AI.
