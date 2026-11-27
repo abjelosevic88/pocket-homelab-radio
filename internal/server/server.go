@@ -234,13 +234,14 @@ func (s *Server) registerWithCore(ctx context.Context) error {
 	m := core.Manifest{
 		Slug: "radio", Name: "Pocket Radio",
 		Description: "Internet radio and stations of your own: find and keep stations from around the world, see the song that is playing, keep the ones you like, and make channels from your own music library that play like real radio — in the browser, the car or any radio app.",
-		Icon:        "/favicon.svg", Version: Version,
+		Icon:        "/favicon.svg", Version: Version, Category: "Media",
 		URL: s.cfg.CoreAppURL, PublicURL: s.cfg.BaseURL, HealthPath: "/healthz", EnvPrefix: "RADIO",
-		Publishes: eventTopics,
-		Offers:    linkOffers,
-		Uses:      append(linkUses(), core.InferenceUse()),
-		Portable:  portable,
-		Services:  []core.ServiceUse{{Type: "navidrome", Reason: "Play channels of your own from your music library"}},
+		Publishes:    eventTopics,
+		Offers:       linkOffers,
+		Uses:         append(linkUses(), core.InferenceUse()),
+		Portable:     portable,
+		Capabilities: capabilities,
+		Services:     []core.ServiceUse{{Type: "navidrome", Reason: "Play channels of your own from your music library"}},
 	}
 	if s.cfg.BaseURL != "" {
 		m.OIDC = &core.OIDCRequest{RedirectURIs: []string{s.oidcCallbackURL()}}

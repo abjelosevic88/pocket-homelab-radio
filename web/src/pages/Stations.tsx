@@ -1,6 +1,7 @@
 // Your stations: the favourites in your own order, with whether each still
 // plays (checked once a day), edit, move, remove and export.
 import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ApiError, api, V1 } from '../lib/api'
 import { ago } from '../lib/format'
 import { usePlayer } from '../lib/player'
@@ -16,7 +17,9 @@ export default function StationsPage() {
   const { toast } = useToast()
   const mobile = useIsMobile()
   const [list, setList] = useState<Station[] | null>(null)
-  const [q, setQ] = useState('')
+  // /stations?q=… (a station found in Pocket Search) starts filtered to it
+  const [sp] = useSearchParams()
+  const [q, setQ] = useState(() => sp.get('q') || '')
   const [edit, setEdit] = useState<Station | null>(null)
   const [del, setDel] = useState<Station | null>(null)
   const [checking, setChecking] = useState<number | null>(null)

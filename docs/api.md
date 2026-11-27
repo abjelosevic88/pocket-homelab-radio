@@ -83,4 +83,15 @@ and `radio:write` (`POST /stations` — adds a favourite, marked with the acting
 Pocket Move can copy your stations, channels and listening out and bring them in: `GET /pocket/portable` describes the
 exports (`move:export`: `/export.json`, `/export.csv`, `/stations/export.m3u`) and imports (`move:import`: `POST /import`,
 `POST /stations/import`). Imports only add; a second run of the same file adds nothing.
+
+Pocket Search, Pocket Day and Pocket Hub read Radio through the capability routes (shelf `Media`), each opened by its
+own scope and nothing else; none of them plays anything or records a listen:
+
+| Route | Scope | What comes back |
+|---|---|---|
+| `GET /pocket/search?q=&limit=` | `pocket:search` | Your stations (favourites and the ones played lately) and channels whose name, genres, country, language or notes have every word; never the station directory. Bangs `!radio`, `!station` |
+| `GET /pocket/day/{date}?tz=` | `pocket:day` | Each station and channel you listened to that day, once, with its minutes and when it was first on; the time, songs heard and songs saved |
+| `GET /pocket/widget` | `pocket:widget` | What plays now (the line, only while this server plays something for you), the stations played lately, then your favourites; minutes today and this week |
+
+There is no quick capture: a station needs its address, a channel its rules.
 Uses Pocket Music (`playlists:write`), the person's Navidrome login (service `navidrome`) and Pocket AI.
